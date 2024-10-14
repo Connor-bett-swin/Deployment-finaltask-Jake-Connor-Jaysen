@@ -1,0 +1,102 @@
+<!-- Authored By Connor Bett  -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tornado of Particles</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Initialize the scene, camera, and renderer
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 50;
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Create a geometry for the particles
+        const particleCount = 1000;
+        const particles = new THREE.BufferGeometry();
+        const positions = new Float32Array(particleCount * 3);
+        const velocities = new Float32Array(particleCount * 3);
+
+        for (let i = 0; i < particleCount; i++) {
+            const angle = Math.random() * 2 * Math.PI;
+            const radius = Math.random() * 20;
+            const height = (Math.random() - 0.5) * 40;
+
+            positions[i * 3] = radius * Math.cos(angle);
+            positions[i * 3 + 1] = height;
+            positions[i * 3 + 2] = radius * Math.sin(angle);
+
+            velocities[i * 3] = -Math.sin(angle) * 0.01;
+            velocities[i * 3 + 1] = Math.random() * 0.01;
+            velocities[i * 3 + 2] = Math.cos(angle) * 0.01;
+        }
+
+        particles.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        particles.setAttribute('velocity', new THREE.BufferAttribute(velocities, 3));
+
+        // Create a material for the particles
+        const particleMaterial = new THREE.PointsMaterial({
+            color: 0xffffff,
+            size: 0.5,
+            transparent: true
+        });
+
+        // Create the particle system
+        const particleSystem = new THREE.Points(particles, particleMaterial);
+        scene.add(particleSystem);
+
+        // Animate the scene
+        function animate() {
+            requestAnimationFrame(animate);
+
+            const positions = particles.attributes.position.array;
+            const velocities = particles.attributes.velocity.array;
+
+            for (let i = 0; i < particleCount; i++) {
+                positions[i * 3] += velocities[i * 3];
+                positions[i * 3 + 1] += velocities[i * 3 + 1];
+                positions[i * 3 + 2] += velocities[i * 3 + 2];
+
+                // Tornado effect: particles move in a spiral
+                const angle = Math.atan2(positions[i * 3 + 2], positions[i * 3]);
+                velocities[i * 3] = -Math.sin(angle) * 0.1;
+                velocities[i * 3 + 1] += 0.002;  // Add some upward force
+                velocities[i * 3 + 2] = Math.cos(angle) * 0.1;
+
+                // Loop particles back to bottom
+                if (positions[i * 3 + 1] > 20) {
+                    positions[i * 3 + 1] = -20;
+                }
+            }
+
+            particles.attributes.position.needsUpdate = true;
+
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
