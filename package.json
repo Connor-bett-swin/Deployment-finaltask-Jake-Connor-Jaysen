@@ -1,19 +1,28 @@
 {
-    "name": "particle-app",
-    "version": "1.0.0",
-    "description": "A Three.js particle effect web app",
-    "main": "index.html",
-    "scripts": {
-      "start": "http-server . -p 8080",
-      "test": "jest"
-    },
-    "author": "Connor Bett",
-    "license": "GPL",
-    "dependencies": {
-      "http-server": "^0.12.3"
-    },
-    "devDependencies": {
-        "jest": "^29.0.0"
+  "name": "particle-app",
+  "version": "1.0.0",
+  "description": "A Three.js particle effect web app",
+  "main": "index.html",
+  "scripts": {
+    "start": "http-server . -p 8080",
+    "test": "jest"
+  },
+  "author": "Connor Bett",
+  "license": "GPL",
+  "dependencies": {
+    "http-server": "^0.12.3"
+  },
+  "devDependencies": {
+      "jest": "^29.0.0"
+  },
+  "jest": {
+    "testResultsProcessor": "jest-junit",
+    "reporters": [
+      "default",
+      ["jest-junit", {
+        "outputDirectory": "test-results",
+        "outputName": "junit.xml"
+      }]
+    ]
   }
 }
-  
